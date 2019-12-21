@@ -1,0 +1,16 @@
+{
+  "parser": "babel-eslint",
+  "extends": ["taro"],
+  "plugins": [
+    "react-hooks"
+  ],
+  "rules": {
+    "jsx-quotes": 0,
+    "import/prefer-default-export": 0,
+    "react/no-unused-state": 0,
+    "no-unused-vars": ["warn", { "varsIgnorePattern": "Taro" }],
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx", ".tsx"] }],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
+  }
+}

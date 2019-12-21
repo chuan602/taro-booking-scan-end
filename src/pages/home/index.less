@@ -1,0 +1,79 @@
+@import '../../styles/base.less';
+
+:host{
+  background-color: @color-bg;
+}
+
+.home {
+  &-tabPane{
+    // border-radius: 5px;
+    // background-color: #fff;
+    // box-sizing: border-box;
+    // padding: 5px;
+    &-container{
+      padding: 10px;
+      background-color: transparent;
+      .inner{
+        border-radius: 10px;
+        background-color: #fff;
+        box-sizing: border-box;
+        padding: 7px 24px;
+      }
+      .ticket-list{
+        box-sizing: border-box;
+        &-item{
+          background-color: #fff;
+          margin-top: 10px;
+          border-radius: 10px;
+          .item-main{
+            box-sizing: border-box;
+            justify-content: space-between;
+            padding: 10px 30px;
+          }
+          .main-left, .main-right{
+            display: flex;
+            flex-direction: column;
+            font-size: 14PX;
+          }
+          .main-left{
+
+          }
+          .departure-time, .rest-ticket{
+            font-size: 30PX;
+            color: chocolate;
+          }
+          .main-right{
+            align-items: flex-end;
+          }
+          .item-footer{
+            box-sizing: border-box;
+            padding: 5px 30px;
+            border-top: 1px dashed #ccc
+          }
+        }
+      }
+    }
+  }
+  &-location{
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    justify-content: center;
+    &.destination{
+      text-align: end;
+    }
+    .destination-name, .departure-name{
+      font-size: 16PX;
+      margin-top: 10px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .departure-label, .destination-label{
+      color: #ccc;
+      font-size: 20px;
+    }
+  }
+  &-location-exchange{
+    text-align: center;
+  }
+}
