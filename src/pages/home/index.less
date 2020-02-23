@@ -11,46 +11,15 @@
     // box-sizing: border-box;
     // padding: 5px;
     &-container{
-      padding: 10px;
       background-color: transparent;
+      .header-banner-outer{
+        padding: 10px;
+      }
       .inner{
         border-radius: 10px;
         background-color: #fff;
         box-sizing: border-box;
         padding: 7px 24px;
-      }
-      .ticket-list{
-        box-sizing: border-box;
-        &-item{
-          background-color: #fff;
-          margin-top: 10px;
-          border-radius: 10px;
-          .item-main{
-            box-sizing: border-box;
-            justify-content: space-between;
-            padding: 10px 30px;
-          }
-          .main-left, .main-right{
-            display: flex;
-            flex-direction: column;
-            font-size: 14PX;
-          }
-          .main-left{
-
-          }
-          .departure-time, .rest-ticket{
-            font-size: 30PX;
-            color: chocolate;
-          }
-          .main-right{
-            align-items: flex-end;
-          }
-          .item-footer{
-            box-sizing: border-box;
-            padding: 5px 30px;
-            border-top: 1px dashed #ccc
-          }
-        }
       }
     }
   }
@@ -75,5 +44,26 @@
   }
   &-location-exchange{
     text-align: center;
+  }
+  .ticket-scroll-list{
+    height: calc(100vh - 230px);
+    box-sizing: border-box;
+    border-radius: 10px;
+    //padding-left: 10px;
+    //padding-right: 10px;
+  }
+  .modal-container{
+    padding: 0 10px;
+  }
+  .modal-content-item{
+    padding: 15px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-btn{
+    letter-spacing: 5px;
+    background-color: @color-theme !important;
+    color: #fff !important;
   }
 }

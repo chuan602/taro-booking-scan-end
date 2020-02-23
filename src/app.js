@@ -1,12 +1,12 @@
 import '@tarojs/async-await';
 import Taro, { Component } from '@tarojs/taro';
+import 'taro-ui/dist/style/index.scss';
+import { Provider } from '@tarojs/redux';
 import Home from './pages/home';
 import dva from './utils/dva';
-import models from './models';
-import { Provider } from '@tarojs/redux';
 
+import models from './models';
 // import './styles/base.less';
-import 'taro-ui/dist/style/index.scss';
 
 const dvaApp = dva.createApp({
   initialState: {},
@@ -17,9 +17,9 @@ const store = dvaApp.getStore();
 class App extends Component {
   config = {
     pages: [
-      'pages/user/index',
-      'pages/login/index',
       'pages/home/index',
+      'pages/login/index',
+      'pages/user/index',
     ],
     window: {
       backgroundTextStyle: 'dark',

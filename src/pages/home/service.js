@@ -1,15 +1,22 @@
 import Request from '../../utils/request';
 
-export const homepage = data =>
+export const queryCarListByDateService = date =>
   Request({
-    url: '/homepage-v3',
+    url: '/carList',
     method: 'GET',
-    data,
+    data: {
+      date
+    },
   });
 
-export const product = data =>
+export const queryBookingTicketService = (carId, num, userId) =>
   Request({
-    url: '/product/filter',
-    method: 'GET',
-    data,
+    url: '/booking',
+    method: 'POST',
+    data: {
+      id: carId,
+      num,
+      userId
+    }
   });
+
