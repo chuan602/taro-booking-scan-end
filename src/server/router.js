@@ -53,9 +53,6 @@ router.get('/carList', function (req, res) {
 
 router.post('/booking', function (req, res) {
   const { id, num, userId } = req.body;
-  console.log('id type', typeof id);
-  console.log('num type', typeof num);
-  console.log('userId type', typeof userId);
   connection.beginTransaction(function (err) {
     if (err) { res.status(500) }
     // 减少数据库中的剩余票数

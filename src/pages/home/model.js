@@ -1,3 +1,4 @@
+import Taro from '@tarojs/taro';
 import {
   queryBookingTicketService,
   queryCarListByDateService
@@ -10,6 +11,7 @@ export default {
     h_ticket: [],
     b_ticket: [],
     tmp_orderId: '',
+    isShowQr: false
   },
   effects: {
     *queryCarListByDate({payload}, { put, call }){
@@ -20,8 +22,27 @@ export default {
       })
     },
     *queryBookingTicket({carId, num, userId}, { put, call }){
+      Taro.showLoading({
+        title: '',
+        mask: true
+      });
       const res = yield call(queryBookingTicketService, carId, num, userId);
-      console.log('orderId', res);
+      Taro.hideLoading();
+      if (res.data) {
+        yield put({
+          type: 'queryBookingTicketEnd',
+          payload: res.data
+        });
+        yield put({
+          type: 'isShowQrEnd',
+          payload: true
+        })
+      } else {
+        Taro.showToast({
+          title: '订票失败',
+          duration: 2000
+        });
+      }
     }
   },
   reducers: {
@@ -29,6 +50,18 @@ export default {
       const h_ticket = payload.filter(item => item.campus === '01');
       const b_ticket = payload.filter(item => item.campus === '02');
       return { ...state, carList: payload, h_ticket, b_ticket};
+    },
+    queryBookingTicketEnd(state, { payload, clear }){
+      return {
+        ...state,
+        tmp_orderId: clear ? '' : payload
+      }
+    },
+    isShowQrEnd(state, { payload }){
+      return {
+        ...state,
+        isShowQr: payload
+      }
     }
   },
 };

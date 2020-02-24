@@ -1,6 +1,6 @@
 import React from "react";
 import Taro, { Component } from '@tarojs/taro';
-import {View, Text, AtIcon, ScrollView, Button} from '@tarojs/components';
+import {View, Text, Image, ScrollView, Button} from '@tarojs/components';
 import { connect } from '@tarojs/redux';
 import { AtTabs, AtTabsPane, AtInputNumber,
   AtModal, AtModalHeader, AtList, AtListItem,
@@ -9,6 +9,7 @@ import { AtTabs, AtTabsPane, AtInputNumber,
 import './index.less';
 import { ListItem } from "../../components/ListItem";
 import {USER_INFO} from "../../utils/constants";
+import {baseUrl} from "../../config";
 
 const tabList = [
   {
@@ -41,7 +42,7 @@ class Index extends Component {
     isHaizhuCampus: true,
     isModalOpen: false,
     carId: '',
-    ticketBookingNum: 1
+    ticketBookingNum: 1,
   };
 
   config = {
@@ -83,9 +84,18 @@ class Index extends Component {
   };
 
   handleModalClose = () => {
+    const { dispatch } = this.props;
     this.setState({
       isModalOpen: false
-    })
+    });
+    dispatch({
+      type: 'home/isShowQrEnd',
+      payload: false
+    });
+    dispatch({
+      type: 'home/queryCarListByDate',
+      payload: '2020-01-30'
+    });
   };
 
   handleBooking = (carId, num, userId) => {
@@ -153,18 +163,15 @@ class Index extends Component {
     );
   };
 
-  renderModal = () => {
-    const { isModalOpen, ticketBookingNum, carId } = this.state;
+  renderBookingLayout = () => {
+    const { ticketBookingNum, carId } = this.state;
     const { carList } = this.props;
     const authObj = Taro.getStorageSync(USER_INFO);
     const auth_stu = authObj.authority === 1;
     const auth_tea = authObj.authority === 2;
     const data = carList.find(item => item.id === carId) || {};
     return (
-      <AtModal
-        isOpened={isModalOpen}
-        onClose={this.handleModalClose}
-      >
+      <View>
         <AtModalHeader>车票信息确认</AtModalHeader>
         <AtModalContent>
           <View className='modal-container'>
@@ -213,6 +220,42 @@ class Index extends Component {
             订票
           </Button>
         </AtModalAction>
+      </View>
+    );
+  };
+
+  renderQrLayout = () => {
+    const { tmp_orderId } = this.props;
+    return (
+      <View>
+        <AtModalHeader>订票成功</AtModalHeader>
+        <AtModalContent>
+          <View className='modal-qr-container'>
+            <Text>订票二维码凭证如下：</Text>
+            <Text>（详情在'我的订单'中查看）</Text>
+          </View>
+          <Image
+            style={{
+              height: '200px'
+            }}
+            src={`${baseUrl}/qr/${encodeURIComponent(tmp_orderId)}`}
+          />
+        </AtModalContent>
+      </View>
+    );
+  };
+
+  renderModal = () => {
+    const { isModalOpen } = this.state;
+    const { isShowQr } = this.props;
+    return (
+      <AtModal
+        isOpened={isModalOpen}
+        onClose={this.handleModalClose}
+      >
+        {
+          isShowQr ? this.renderQrLayout() : this.renderBookingLayout()
+        }
       </AtModal>
     )
   };
