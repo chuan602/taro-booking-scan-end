@@ -2,10 +2,11 @@ import React from "react";
 import Taro, { Component } from '@tarojs/taro';
 import {View, Text, Image, ScrollView, Button} from '@tarojs/components';
 import { connect } from '@tarojs/redux';
-import { AtTabs, AtTabsPane, AtInputNumber,
-  AtModal, AtModalHeader, AtList, AtListItem,
-  AtModalContent, AtModalAction,
-  AtButton  } from 'taro-ui';
+import {
+  AtTabs, AtTabsPane, AtInputNumber,
+  AtModal, AtModalHeader,
+  AtModalContent, AtModalAction, AtIcon
+} from 'taro-ui';
 import './index.less';
 import { ListItem } from "../../components/ListItem";
 import {USER_INFO} from "../../utils/constants";
@@ -50,6 +51,10 @@ class Index extends Component {
   };
 
   componentDidMount = () => {
+    this.queryTicketListData();
+  };
+
+  queryTicketListData = () => {
     const { dispatch } = this.props;
     dispatch({
       type: 'home/queryCarListByDate',
@@ -91,10 +96,6 @@ class Index extends Component {
     dispatch({
       type: 'home/isShowQrEnd',
       payload: false
-    });
-    dispatch({
-      type: 'home/queryCarListByDate',
-      payload: '2020-01-30'
     });
   };
 
@@ -226,13 +227,15 @@ class Index extends Component {
 
   renderQrLayout = () => {
     const { tmp_orderId } = this.props;
+    // 更新余票数
+    this.queryTicketListData();
     return (
       <View>
         <AtModalHeader>订票成功</AtModalHeader>
         <AtModalContent>
           <View className='modal-qr-container'>
             <Text>订票二维码凭证如下：</Text>
-            <Text>（详情在'我的订单'中查看）</Text>
+            <Text className='modal-qr-tips'>（详情在'我的订单'中查看）</Text>
           </View>
           <Image
             style={{
