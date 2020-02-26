@@ -40,7 +40,9 @@ export default class User extends Component {
           <AtListItem
             title='我的订单'
             thumb={orderIcon}
-            onClick={() => {}}
+            onClick={() => Taro.navigateTo({
+              url: '/pages/order/index'
+            })}
             arrow='right'
           />
           <AtListItem

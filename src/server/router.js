@@ -99,4 +99,25 @@ router.get('/qr/:id', function (req, res) {
   qrCode.pipe(res);
 });
 
+/*
+* GET 获取指定用户的订单
+* */
+router.get('/order/:userId', function (req, res) {
+  const userId = req.params.userId;
+  const { type } = req.query;
+  const sql = type ? `SELECT * FROM t_order o INNER JOIN t_ticket t ON o.car_id = t.id WHERE user_id = ? AND order_status = ? ORDER BY order_time DESC` :
+    `SELECT * FROM t_order o INNER JOIN t_ticket t ON o.car_id = t.id WHERE user_id = ? ORDER BY order_time DESC`;
+  const paramsArr = type ? [userId, +type] : [userId];
+  connection.query(sql, paramsArr, function (err, data) {
+    if (err) res.status(500);
+    for (const item of data){
+      // 处理班车日期和时间的格式
+      item.depart_time = item.depart_time.slice(0, 5);
+      item.depart_date = new Date(item.depart_date).toLocaleDateString();
+      item.order_time = new Date(item.order_time).toLocaleDateString() + ' ' + new Date(item.order_time).toTimeString().slice(0,5);
+    }
+    res.json(data);
+  })
+});
+
 module.exports = router;

@@ -8,7 +8,7 @@ import {
   AtModalContent, AtModalAction, AtIcon
 } from 'taro-ui';
 import './index.less';
-import { ListItem } from "../../components/ListItem";
+import ListItem from '../../components/ListItem';
 import {USER_INFO} from "../../utils/constants";
 import {baseUrl} from "../../config";
 

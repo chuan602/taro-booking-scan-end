@@ -7,7 +7,7 @@ const disabledStyle = {
   color: '#999'
 };
 
-class ListItem extends Component{
+export default class ListItem extends Component{
   render() {
     const {
       key,
@@ -54,4 +54,3 @@ class ListItem extends Component{
   }
 }
 
-export { ListItem };
