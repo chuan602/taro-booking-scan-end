@@ -51,6 +51,9 @@ router.get('/carList', function (req, res) {
   })
 });
 
+/*
+* POST 订票/预留票接口
+* */
 router.post('/booking', function (req, res) {
   const { id, num, userId } = req.body;
   connection.beginTransaction(function (err) {
@@ -102,11 +105,11 @@ router.get('/qr/:id', function (req, res) {
 /*
 * GET 获取指定用户的订单
 * */
-router.get('/order/:userId', function (req, res) {
+router.get('/order/list/:userId', function (req, res) {
   const userId = req.params.userId;
   const { type } = req.query;
-  const sql = type ? `SELECT * FROM t_order o INNER JOIN t_ticket t ON o.car_id = t.id WHERE user_id = ? AND order_status = ? ORDER BY order_time DESC` :
-    `SELECT * FROM t_order o INNER JOIN t_ticket t ON o.car_id = t.id WHERE user_id = ? ORDER BY order_time DESC`;
+  const sql = type ? `SELECT * FROM t_ticket t INNER JOIN t_order o ON o.car_id = t.id WHERE user_id = ? AND order_status = ? ORDER BY order_time DESC` :
+    `SELECT * FROM t_ticket t INNER JOIN t_order o ON o.car_id = t.id WHERE user_id = ? ORDER BY order_time DESC`;
   const paramsArr = type ? [userId, +type] : [userId];
   connection.query(sql, paramsArr, function (err, data) {
     if (err) res.status(500);
@@ -118,6 +121,29 @@ router.get('/order/:userId', function (req, res) {
     }
     res.json(data);
   })
+});
+
+/*
+* POST 退票接口
+* */
+router.post('/order/return', function (req, res) {
+  const { orderId } = req.body;
+  connection.query(`SELECT car_id, ticket_num FROM t_order WHERE id = ?`, [orderId], function (err, data1) {
+    if (err) res.status(500);
+    if (data1) {
+      const { car_id, ticket_num } = data1[0];
+      connection.query(`UPDATE t_order SET order_status = 2 WHERE id = ?`, [orderId], function (err, data2) {
+        if (err) res.status(500);
+        if (data2) {
+          connection.query(`UPDATE t_ticket SET rest_ticket = rest_ticket + ? WHERE id = ?`,
+            [ticket_num, car_id], function (err, data3) {
+              if (err) res.status(500);
+              if (data3) res.json(data3);
+            });
+        }
+      })
+    }
+  });
 });
 
 module.exports = router;

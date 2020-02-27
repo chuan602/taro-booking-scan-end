@@ -15,6 +15,7 @@ export default class OrderItem extends Component{
 
   render() {
     const {
+      key,
       departure,
       destination,
       orderTime,
@@ -22,19 +23,23 @@ export default class OrderItem extends Component{
       departPlace,
       ticketNum,
       carNum,
-      statusCode
+      statusCode,
+      onShowQrClick=()=>{},
+      onReturnTicketClick=()=>{}
     } = this.props;
     const btnGroup = (
       <View className='btn-group-container'>
         <Button
           className='btn btn-show-qr'
           size='mini'
+          onClick={onShowQrClick}
         >
           查看二维码
         </Button>
         <Button
-            className='btn btn-return-ticket'
+          className='btn btn-return-ticket'
           size='mini'
+          onClick={onReturnTicketClick}
         >
           退票
         </Button>
@@ -42,6 +47,7 @@ export default class OrderItem extends Component{
     );
     return (
       <View
+        key={key}
         className='order-container'
       >
         <View className='title-container'>

@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro';
-import { queryOrderListService } from './service';
+import { queryOrderListService, queryOrderReturnService } from './service';
 import { USER_INFO } from '../../utils/constants';
 
 export default {
@@ -16,6 +16,13 @@ export default {
         type: 'queryOrderListEnd',
         payload: res.data || []
       })
+    },
+    *queryOrderReturn({ payload }, { put, call }){
+      const res = yield call(queryOrderReturnService, payload);
+      console.log('res', res);
+      yield put({
+        type: 'queryOrderList'
+      });
     }
   },
   reducers: {
