@@ -2,7 +2,7 @@ import React from "react";
 import Taro, { Component } from '@tarojs/taro';
 import {Text, View} from '@tarojs/components';
 import { connect } from '@tarojs/redux';
-import {AtList, AtListItem, AtToast} from "taro-ui";
+import {AtList, AtListItem, AtModal, AtToast} from "taro-ui";
 import { USER_INFO } from '../../utils/constants';
 import orderIcon from '../../images/user/order.png';
 import pointIcon from '../../images/user/point.png';
@@ -18,23 +18,60 @@ export default class User extends Component {
   };
 
   state = {
-    isToastOpen: false
+    isModalOpen: false
   };
 
   componentDidMount = () => {
 
   };
 
-  render() {
-    const { isToastOpen } = this.state;
-    const { username } = Taro.getStorageSync('USER_INFO') || {};
-    if (!username){
+  handleModalClose = () => {
+    this.setState({
+      isModalOpen: false
+    })
+  };
 
-    }
+  handleModalCancel = () => {
+    this.setState({
+      isModalOpen: false
+    })
+  };
+
+  handleModalConfirm = () => {
+    Taro.clearStorage();
+    Taro.reLaunch({
+      url: '/pages/login/index'
+    })
+  };
+
+  handleLogoutClick = () => {
+    this.setState({
+      isModalOpen: true
+    })
+  };
+
+  render() {
+    const { isModalOpen } = this.state;
+    const { authority, num } = Taro.getStorageSync('USER_INFO') || {};
     return (
       <View className="user-page">
         <View className="user-page-banner">
-          <Text onClick={() => this.setState({ isToastOpen: true })}>{username}</Text>
+          <View className='user-info-card'>
+            <View className='left-container'>
+              <Text className='left-title'>
+                {
+                  authority === 1 ? '学号' : authority === 2 ? '工号' : '管理员'
+                }
+              </Text>
+              <Text className='left-value'>{ num }</Text>
+            </View>
+            <Text
+              className='logout'
+              onClick={this.handleLogoutClick}
+            >
+              退出登陆
+            </Text>
+          </View>
         </View>
         <AtList>
           <AtListItem
@@ -52,16 +89,22 @@ export default class User extends Component {
             arrow='right'
           />
           <AtListItem
-            title='修改密码'
+            title='密码'
             thumb={modifyIcon}
             onClick={() => {}}
             arrow='right'
           />
         </AtList>
-
-
-        {/* Toast提醒框 */}
-        <AtToast isOpened={isToastOpen} text="你还没登陆，请先登陆再操作" status="error" onClose={() => {}}></AtToast>
+        <AtModal
+          isOpened={isModalOpen}
+          title='登出确认'
+          cancelText='取消'
+          confirmText='确认'
+          onClose={ this.handleModalClose }
+          onCancel={ this.handleModalCancel }
+          onConfirm={ this.handleModalConfirm }
+          content='确定退出登陆吗？'
+        />
       </View>
     )
   }

@@ -11,9 +11,39 @@
   .wh(100%, 280px);
   .flex();
   background-color: #fff;
-  padding-left: 30px;
+  padding: 30px;
   font-size: 50px;
   color: @color-dark;
   margin-bottom: 15px;
+}
+
+.user-info-card{
+  .wh(100%, 100%);
+  border-radius: 20px;
+  font-size: 16PX;
+  padding: 30px;
+  background: linear-gradient(to right, rgba(97, 144, 232, .9), rgba(97, 144, 200, .9));
+  .flex(space-between);
+
+  .left-container{
+    .flex(center, flex-start);
+    flex-direction: column;
+    color: #fff;
+
+  }
+  .left-title{
+    font-size: 12PX;
+    color: #eee;
+    margin-bottom: 10px;
+  }
+  .left-value{
+    font-weight: bold;
+  }
+  .logout{
+    font-size: 14PX;
+    letter-spacing: 2px;
+    color: #eee;
+  }
+
 }
 
