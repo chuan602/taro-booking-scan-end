@@ -108,12 +108,12 @@ class Order extends Component {
           <View className='modal-qr-container'>
             <Text>二维码凭证：</Text>
           </View>
-          <Image
-            style={{
-              height: '200px'
-            }}
-            src={`${baseUrl}/qr/${encodeURIComponent(tmp_orderId)}`}
-          />
+          <View className='modal-image-container'>
+            <Image
+              mode='aspectFit'
+              src={`${baseUrl}/qr/${encodeURIComponent(tmp_orderId)}`}
+            />
+          </View>
         </AtModalContent>
       </View>
     );

@@ -21,6 +21,7 @@ class App extends Component {
       'pages/home/index',
       'pages/user/index',
       'pages/order/index',
+      'pages/password/index',
     ],
     window: {
       backgroundTextStyle: 'dark',

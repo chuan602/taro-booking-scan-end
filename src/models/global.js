@@ -27,10 +27,14 @@ export default {
             url: '/pages/home/index'
           })
         } else {
-          //登陆验证失败
+          let msg = '账号或密码错误！';
+          if (Math.floor(res.statusCode/500) === 1) {
+            msg = '服务器出错，请联系管理员'
+          }
+          // 显示出错标语
           Taro.atMessage({
             type: 'error',
-            message: '账号或密码错误！'
+            message: msg
           });
           yield put({
             type: 'isLoginErrorEnd',

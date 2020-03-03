@@ -18,9 +18,12 @@ router.get('/', function (req, res) {
     res.send('this is router')
 });
 
+/*
+* POST 登陆API
+* */
 router.post('/login', function (req, res) {
-    const {username, password} = req.body;
-    connection.query(`select * from t_users where username = ? and password = ?`, [username, password], function (err, data) {
+    const {userNum, password} = req.body;
+    connection.query(`select * from t_users where num = ? and password = ?`, [userNum, password], function (err, data) {
         if (err) { res.status(500) }
         if (data && data.length) {
           res.json(data[0]);
@@ -144,6 +147,25 @@ router.post('/order/return', function (req, res) {
       })
     }
   });
+});
+
+router.post('/modify/password/:userId', function (req, res) {
+  const userId = req.params.userId;
+  const { originPassword, newPassword } = req.body;
+  connection.query(`select * from t_users where id = ? and password = ?`,
+    [userId, originPassword], function (err, data) {
+      if (err) res.status(500);
+      if (!data.length){
+        // 原密码错误
+        res.json('')
+      } else {
+        connection.query(`UPDATE t_users SET password = ? WHERE id = ?`,
+          [newPassword, userId], function (err, data) {
+            if (err) res.status(500);
+            res.json('success');
+          })
+      }
+    })
 });
 
 module.exports = router;

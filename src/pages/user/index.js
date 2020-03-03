@@ -89,9 +89,11 @@ export default class User extends Component {
             arrow='right'
           />
           <AtListItem
-            title='密码'
+            title='更改密码'
             thumb={modifyIcon}
-            onClick={() => {}}
+            onClick={() => Taro.navigateTo({
+              url: '/pages/password/index'
+            })}
             arrow='right'
           />
         </AtList>

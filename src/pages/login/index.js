@@ -39,7 +39,7 @@ class Login extends Component {
     const { usernameVal, passwordVal} = this.state;
     dispatch({
       type: 'global/queryLogin',
-      payload: {username: usernameVal, password: passwordVal}
+      payload: {userNum: usernameVal, password: passwordVal}
     });
   };
 
@@ -49,15 +49,15 @@ class Login extends Component {
     return (
       <View className='login-page' id='login-page'>
         <View className='img-container'>
-          <Image className='zhku-img' src={zhku} />
+          <Image className='zhku-img' mode='aspectFit' src={zhku} />
         </View>
         <AtForm>
           <AtInput
-            clear={true}
-            autoFocus={true}
+            clear
+            autoFocus
             className='username'
             name='username'
-            placeholder='请输入用户名'
+            placeholder='请输入学号/工号'
             value={ usernameVal }
             error={isLoginError}
             onChange={ this.usernameOnChange.bind(this) }
