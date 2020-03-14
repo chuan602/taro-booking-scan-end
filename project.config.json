@@ -1,8 +1,8 @@
 {
 	"miniprogramRoot": "dist/",
-	"projectname": "taro-msparis",
+	"projectname": "taro-booking",
 	"description": "",
-	"appid": "wxfa2e20f3632576d2",
+	"appid": "wxde7f6ac3644260a1",
 	"setting": {
 		"urlCheck": false,
 		"es6": false,

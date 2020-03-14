@@ -106,6 +106,7 @@ export default class User extends Component {
           onCancel={ this.handleModalCancel }
           onConfirm={ this.handleModalConfirm }
           content='确定退出登陆吗？'
+          // content={<Text style={{ textAlign: 'center', color: '#ccc' }}>确定退出登陆吗？</Text>}
         />
       </View>
     )

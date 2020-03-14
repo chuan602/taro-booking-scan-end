@@ -1,6 +1,6 @@
 const config = {
   projectName: 'taro-booking',
-  date: '2018-9-27',
+  date: '2019-9-27',
   // 设计稿尺寸
   designWidth: 750,
   sourceRoot: 'src',
