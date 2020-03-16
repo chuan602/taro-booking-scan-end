@@ -1,6 +1,7 @@
 import React from "react";
 import Taro, { Component } from '@tarojs/taro';
 import {View, Text, Image, ScrollView, Button} from '@tarojs/components';
+import dayjs from 'dayjs';
 import { connect } from '@tarojs/redux';
 import {
   AtTabs, AtTabsPane, AtInputNumber,
@@ -10,28 +11,13 @@ import {
 import './index.less';
 import ListItem from '../../components/ListItem';
 import {USER_INFO} from "../../utils/constants";
-import {baseUrl} from "../../config";
+import {baseUrl, stuBaseDay, teaBaseDay, manBaseDay} from "../../config";
 
-const tabList = [
-  {
-    title: '1月30'
-  },
-  {
-    title: '1月31'
-  },
-  {
-    title: '2月01'
-  },
-  {
-    title: '2月02'
-  },
-  {
-    title: '2月03'
-  },
-  {
-    title: '2月04'
-  }
-];
+/**
+ * 日期tabList，
+ * @type {Array} {title, value}
+ */
+let tabList = [];
 
 @connect(({ home }) => ({
   ...home,
@@ -51,15 +37,42 @@ class Index extends Component {
   };
 
   componentDidMount = () => {
-    this.queryTicketListData();
+    // 更新TabList
+    this.processTabList();
+    // 查询当天票务列表
+    this.queryTicketListData(tabList[0].value);
   };
 
-  queryTicketListData = () => {
+  /**
+   * 查询指定日期的票务情况
+   * @param {string} day 要查询的日期，参数必须是dayjs可解释的
+   */
+  queryTicketListData = (day) => {
     const { dispatch } = this.props;
+    const date = dayjs(day);
+    const valueDate = date.format('YYYY-MM-DD');
     dispatch({
       type: 'home/queryCarListByDate',
-      payload: '2020-01-30'
+      payload: valueDate
     });
+
+  };
+
+  processTabList = () => {
+    const authObj = Taro.getStorageSync(USER_INFO);
+    const auth_stu = authObj.authority === 1;
+    const auth_tea = authObj.authority === 2;
+    const bookableDateNum = auth_stu ? stuBaseDay : auth_tea ? teaBaseDay : manBaseDay;
+    const today = dayjs();
+    tabList = [];
+
+    // 更新tabs日期
+    for (let i = 0; i < bookableDateNum; ++i){
+      tabList.push({
+        title: today.add(i, 'day').format('M[月]DD'),
+        value: today.add(i, 'day').format('YYYY-MM-DD')
+      })
+    }
   };
 
   handleItemClick = (id) => {
@@ -70,6 +83,7 @@ class Index extends Component {
   };
 
   handleTabClick = (current) => {
+    this.queryTicketListData(tabList[current].value);
     this.setState({
       tabCurrent: current,
       isHaizhuCampus: true
@@ -141,6 +155,8 @@ class Index extends Component {
     const { h_ticket, b_ticket } = this.props;
     const { isHaizhuCampus } = this.state;
     const ticketData = isHaizhuCampus ? h_ticket : b_ticket;
+
+    // todo 需要filter掉已过时的班次
     const list = ticketData.map((item) => (
       <ListItem
         key={item.id}
@@ -197,7 +213,11 @@ class Index extends Component {
               <Text className='item-value'>{data.car_num}</Text>
             </View>
             <View className='modal-content-item'>
-              <Text className='item-title'>订票数</Text>
+              <Text className='item-title'>
+                {
+                  auth_tea || auth_stu ? '订票数' : '预留票数'
+                }
+              </Text>
               {
                 auth_stu ? 1 : (
                   <AtInputNumber
@@ -218,7 +238,7 @@ class Index extends Component {
             className='modal-btn'
             onClick={() => this.handleBooking(carId, ticketBookingNum, authObj.id)}
           >
-            订票
+            { auth_stu || auth_tea ? '订票' : '确认预留' }
           </Button>
         </AtModalAction>
       </View>
@@ -263,27 +283,33 @@ class Index extends Component {
     )
   };
 
+  renderTabPane = () => {
+    const { tabCurrent } = this.state;
+    const arr = tabList.slice();
+    return arr.length
+      ? arr.map((item, index) => (
+        <AtTabsPane className='home-tabPane' current={tabCurrent} index={index}>
+          <View className='home-tabPane-container'>
+            { this.renderDestCard() }
+            { this.renderTicketList() }
+          </View>
+        </AtTabsPane>))
+      : '';
+  };
+
   render() {
     const { tabCurrent } = this.state;
     return (
       <View className="home">
         <AtTabs
-          current={this.state.tabCurrent}
-          scroll
+          current={tabCurrent}
+          scroll={tabList.length > 4}
           tabList={tabList}
-          onClick={this.handleTabClick.bind(this)}
+          onClick={this.handleTabClick}
         >
-          <AtTabsPane className='home-tabPane' current={tabCurrent} index={0}>
-            <View className='home-tabPane-container'>
-              { this.renderDestCard() }
-              { this.renderTicketList() }
-            </View>
-          </AtTabsPane>
-          <AtTabsPane className='home-tabPane' current={tabCurrent} index={1}>TabsPane2</AtTabsPane>
-          <AtTabsPane className='home-tabPane' current={tabCurrent} index={2}>TabsPane3</AtTabsPane>
-          <AtTabsPane className='home-tabPane' current={tabCurrent} index={3}>TabsPane4</AtTabsPane>
-          <AtTabsPane className='home-tabPane' current={tabCurrent} index={4}>TabsPane5</AtTabsPane>
-          <AtTabsPane className='home-tabPane' current={tabCurrent} index={5}>TabsPane6</AtTabsPane>
+          {
+            this.renderTabPane()
+          }
         </AtTabs>
         {
           /*

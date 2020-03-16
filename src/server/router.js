@@ -2,14 +2,13 @@ const express = require('express');
 const mysql = require('mysql');
 const uuid = require('uuid/v1');
 const qr = require('qr-image');
-const { isHttps } = require('./config');
 
 const router = express.Router();
 
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: isHttps ? '123' : '',
+    password: '123',
     database: 'booking'
 });
 
