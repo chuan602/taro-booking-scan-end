@@ -1,7 +1,9 @@
 const express = require('express');
 const mysql = require('mysql');
 const uuid = require('uuid/v1');
+const dayjs = require('dayjs');
 const qr = require('qr-image');
+const { deadlineMinute } = require('./config');
 
 const router = express.Router();
 
@@ -38,8 +40,12 @@ router.post('/login', function (req, res) {
 * */
 router.get('/carList', function (req, res) {
   const { date } = req.query;
-  connection.query(`select * from t_ticket where depart_date = ? order by depart_time`,
-    [date], function (err, data) {
+  // 订票截止时间 （发车前10分钟）
+  const deadlineTime = dayjs().isBefore(dayjs(date))
+    ? '00:00:00'
+    : dayjs().add(deadlineMinute, 'minute').format('HH:mm:ss')
+  connection.query(`select * from t_ticket where depart_date = ? and depart_time > ? order by depart_time`,
+    [date, deadlineTime], function (err, data) {
     if (err) { res.status(500) }
     if (data && data.length) {
       for (const item of data){

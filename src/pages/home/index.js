@@ -8,8 +8,10 @@ import {
   AtModal, AtModalHeader,
   AtModalContent, AtModalAction, AtIcon
 } from 'taro-ui';
+import Blank from "../../components/Blank";
 import './index.less';
 import ListItem from '../../components/ListItem';
+import homeEmpty from '../../images/icon/empty.png';
 import {USER_INFO} from "../../utils/constants";
 import {baseUrl, stuBaseDay, teaBaseDay, manBaseDay} from "../../config";
 
@@ -34,13 +36,35 @@ class Index extends Component {
 
   config = {
     navigationBarTitleText: '首页',
+    enablePullDownRefresh: true
   };
 
+  componentWillMount() {
+    Taro.showLoading({
+      title: '正在加载...',
+      mask: true,
+    });
+    this.refreshData();
+  }
+
   componentDidMount = () => {
+
+  };
+
+  onPullDownRefresh = () => {
+    Taro.showLoading({
+      title: '正在加载...',
+      mask: true,
+    });
+    this.refreshData();
+  };
+
+  refreshData = () => {
+    const { tabCurrent } = this.state;
     // 更新TabList
     this.processTabList();
     // 查询当天票务列表
-    this.queryTicketListData(tabList[0].value);
+    this.queryTicketListData(tabList[tabCurrent].value);
   };
 
   /**
@@ -83,11 +107,15 @@ class Index extends Component {
   };
 
   handleTabClick = (current) => {
-    this.queryTicketListData(tabList[current].value);
     this.setState({
       tabCurrent: current,
       isHaizhuCampus: true
-    })
+    });
+    Taro.showLoading({
+      title: '正在加载...',
+      mask: true,
+    });
+    this.queryTicketListData(tabList[current].value);
   };
 
   handleDepartureChange = () => {
@@ -156,18 +184,19 @@ class Index extends Component {
     const { isHaizhuCampus } = this.state;
     const ticketData = isHaizhuCampus ? h_ticket : b_ticket;
 
-    // todo 需要filter掉已过时的班次
-    const list = ticketData.map((item) => (
-      <ListItem
-        key={item.id}
-        departTime={item.depart_time}
-        restTicket={item.rest_ticket}
-        departure={item.depart_place}
-        carNum={item.car_num}
-        disabled={item.rest_ticket === 0}
-        onClick={() => this.handleItemClick(item.id)}
-      />
-    ));
+    const list = ticketData.length
+      ? ticketData.map((item) => (
+          <ListItem
+            key={item.id}
+            departTime={item.depart_time}
+            restTicket={item.rest_ticket}
+            departure={item.depart_place}
+            carNum={item.car_num}
+            disabled={item.rest_ticket === 0}
+            onClick={() => this.handleItemClick(item.id)}
+          />)
+        )
+      : <Blank content='暂无可订票务' icon={homeEmpty}/>;
 
     return (
       <ScrollView

@@ -15,11 +15,16 @@ export default {
   },
   effects: {
     *queryCarListByDate({payload}, { put, call }){
-      const res = yield call(queryCarListByDateService, payload);
-      yield put({
-        type: 'queryCarListEnd',
-        payload: res.data || []
-      })
+      try {
+        const res = yield call(queryCarListByDateService, payload);
+        yield put({
+          type: 'queryCarListEnd',
+          payload: res.data || []
+        })
+      } finally {
+        Taro.hideLoading();
+        Taro.stopPullDownRefresh();
+      }
     },
     *queryBookingTicket({carId, num, userId}, { put, call }){
       Taro.showLoading({
