@@ -17,26 +17,6 @@ export default class User extends Component {
     navigationBarTitleText: '我的',
   };
 
-  state = {
-    isModalOpen: false
-  };
-
-  componentDidMount = () => {
-
-  };
-
-  handleModalClose = () => {
-    this.setState({
-      isModalOpen: false
-    })
-  };
-
-  handleModalCancel = () => {
-    this.setState({
-      isModalOpen: false
-    })
-  };
-
   handleModalConfirm = () => {
     Taro.clearStorage();
     Taro.reLaunch({
@@ -45,9 +25,13 @@ export default class User extends Component {
   };
 
   handleLogoutClick = () => {
-    this.setState({
-      isModalOpen: true
+    Taro.showModal({
+      title: '登出确认',
+      content: '确定退出登陆吗'
     })
+      .then(({confirm}) => {
+        confirm && this.handleModalConfirm();
+      });
   };
 
   render() {
@@ -97,17 +81,6 @@ export default class User extends Component {
             arrow='right'
           />
         </AtList>
-        <AtModal
-          isOpened={isModalOpen}
-          title='登出确认'
-          cancelText='取消'
-          confirmText='确认'
-          onClose={ this.handleModalClose }
-          onCancel={ this.handleModalCancel }
-          onConfirm={ this.handleModalConfirm }
-          content='确定退出登陆吗？'
-          // content={<Text style={{ textAlign: 'center', color: '#ccc' }}>确定退出登陆吗？</Text>}
-        />
       </View>
     )
   }

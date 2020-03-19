@@ -34,13 +34,18 @@ class Order extends Component {
   state = {
     tabCurrent: 0,
     isModalOpen: false,
-    isShowQr: false,
     tmp_orderId: ''
   };
 
   config = {
     navigationBarTitleText: '我的订单',
+    enablePullDownRefresh: true
   };
+
+  onPullDownRefresh = () => {
+    this.queryAllOrderData();
+  };
+
 
   componentDidMount = () => {
     this.queryAllOrderData();
@@ -68,17 +73,22 @@ class Order extends Component {
   handleShowQrClick = (id) => {
     this.setState({
       isModalOpen: true,
-      isShowQr: true,
       tmp_orderId: id
     })
   };
 
   handleReturnTicketClick = (id) => {
     this.setState({
-      isModalOpen: true,
-      isShowQr: false,
       tmp_orderId: id
-    })
+    }, () => {
+      Taro.showModal({
+        title: '退票确认',
+        content: '你确定要退回该车票？'
+      })
+        .then(({confirm}) => {
+          confirm && this.handleReturnConfirm();
+        });
+    });
   };
 
   handleReturnCancel = () => {
@@ -90,14 +100,10 @@ class Order extends Component {
   handleReturnConfirm = () => {
     const {dispatch} = this.props;
     const {tmp_orderId} = this.state;
-    console.log('tmp_orderId', tmp_orderId);
     dispatch({
       type: 'order/queryOrderReturn',
       payload: tmp_orderId
     });
-    this.setState({
-      isModalOpen: false
-    })
   };
 
   renderQrLayout = () => {
@@ -119,34 +125,15 @@ class Order extends Component {
     );
   };
 
-  renderReturnConfirmLayout = () => {
-    return (
-      <View>
-        <AtModalHeader>
-          <View className='modal-return-title'>退票确认</View>
-        </AtModalHeader>
-        <AtModalContent>
-          <View className='modal-return-container'>
-            <Text>你确定要退回该车票？</Text>
-          </View>
-        </AtModalContent>
-        <AtModalAction>
-          <Button onClick={this.handleReturnCancel}>取消</Button>
-          <Button onClick={this.handleReturnConfirm}>确定</Button>
-        </AtModalAction>
-      </View>
-    );
-  };
-
   renderModal = () => {
-    const {isModalOpen, isShowQr} = this.state;
+    const {isModalOpen} = this.state;
     return (
       <AtModal
         isOpened={isModalOpen}
         onClose={this.handleModalClose}
       >
         {
-          isShowQr ? this.renderQrLayout() : this.renderReturnConfirmLayout()
+          this.renderQrLayout()
         }
       </AtModal>
     )
@@ -155,7 +142,6 @@ class Order extends Component {
   render() {
     const {tabCurrent} = this.state;
     const {allOrder} = this.props;
-    console.log('allOrder', allOrder);
     const togoOrder = allOrder.filter(order => order.order_status === 0) || [];
     const expiredOrder = allOrder.filter(order => order.order_status === 1) || [];
     const returnedOrder = allOrder.filter(order => order.order_status === 2) || [];
