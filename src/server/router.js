@@ -3,7 +3,7 @@ const mysql = require('mysql');
 const uuid = require('uuid/v1');
 const dayjs = require('dayjs');
 const qr = require('qr-image');
-const { deadlineMinute } = require('./config');
+const { DEADLINE_TIME, INVALIDATION_TIME } = require('./config');
 
 const router = express.Router();
 
@@ -43,7 +43,7 @@ router.get('/carList', function (req, res) {
   // 订票截止时间 （发车前10分钟）
   const deadlineTime = dayjs().isBefore(dayjs(date))
     ? '00:00:00'
-    : dayjs().add(deadlineMinute, 'minute').format('HH:mm:ss')
+    : dayjs().add(DEADLINE_TIME, 'minute').format('HH:mm:ss');
   connection.query(`select * from t_ticket where depart_date = ? and depart_time > ? order by depart_time`,
     [date, deadlineTime], function (err, data) {
     if (err) { res.status(500) }
@@ -131,6 +131,13 @@ router.get('/qr/:id', function (req, res) {
 router.get('/order/list/:userId', function (req, res) {
   const userId = req.params.userId;
   const { type } = req.query;
+  // 更新 待出行 订单的状态（是否过期）
+  const date = dayjs().format('YYYY-MM-DD');
+  const time = dayjs().add(INVALIDATION_TIME, 'minute').format('HH:mm:ss');
+  const updateStatusSql = `UPDATE t_order SET order_status = 3 WHERE id IN (SELECT tmp.id FROM (SELECT o.id AS id FROM t_ticket t INNER JOIN t_order o ON o.car_id = t.id WHERE user_id = ? AND order_status = 0 AND t.depart_date < ? OR user_id = ? AND order_status = 0 AND t.depart_date = ? AND t.depart_time < ?)tmp)`;
+  connection.query(updateStatusSql, [userId, date, userId, date, time], () => {});
+
+  // 获取用户的订单列表
   const sql = type ? `SELECT * FROM t_ticket t INNER JOIN t_order o ON o.car_id = t.id WHERE user_id = ? AND order_status = ? ORDER BY order_time DESC` :
     `SELECT * FROM t_ticket t INNER JOIN t_order o ON o.car_id = t.id WHERE user_id = ? ORDER BY order_time DESC`;
   const paramsArr = type ? [userId, +type] : [userId];
@@ -169,6 +176,9 @@ router.post('/order/return', function (req, res) {
   });
 });
 
+/**
+ * POST 更改密码接口
+ */
 router.post('/modify/password/:userId', function (req, res) {
   const userId = req.params.userId;
   const { originPassword, newPassword } = req.body;

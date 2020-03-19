@@ -8,9 +8,20 @@ import iconHaveWent from '../../images/order/order_already.png';
 import iconReturn from '../../images/order/order_return.png';
 
 export default class OrderItem extends Component{
-  processStatusCode = (togo, haveWent, haveReturn) => {
+  processStatusCode = (togo, haveWent, haveReturn, invalidation) => {
     const { statusCode } = this.props;
-    return statusCode === 0 ? togo : statusCode === 1 ? haveWent : haveReturn
+    switch (statusCode) {
+      case 0:
+        return togo;
+      case 1:
+        return haveWent;
+      case 2:
+        return haveReturn;
+      case 3:
+        return invalidation;
+      default:
+        return ;
+    }
   };
 
   render() {
@@ -54,7 +65,7 @@ export default class OrderItem extends Component{
           <View className='title-left'>
             <Image
               src={
-                this.processStatusCode(iconTogo, iconHaveWent, iconReturn)
+                this.processStatusCode(iconTogo, iconHaveWent, iconReturn, iconReturn)
               }
               className='title-icon'
             />
@@ -66,7 +77,7 @@ export default class OrderItem extends Component{
           </View>
           <Text className='title-right'>
             {
-              this.processStatusCode('待出行','已出行', '已退票')
+              this.processStatusCode('待出行','已出行', '已退票', '已过期')
             }
           </Text>
         </View>

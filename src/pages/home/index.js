@@ -120,12 +120,13 @@ class Index extends Component {
     this.setState({
       tabCurrent: current,
       isHaizhuCampus: true
+    }, () => {
+      Taro.showLoading({
+        title: '正在加载...',
+        mask: true,
+      });
+      this.queryTicketListData(tabList[current].value);
     });
-    Taro.showLoading({
-      title: '正在加载...',
-      mask: true,
-    });
-    this.queryTicketListData(tabList[current].value);
   };
 
   handleDepartureChange = () => {

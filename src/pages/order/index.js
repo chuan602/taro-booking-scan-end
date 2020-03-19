@@ -22,6 +22,9 @@ const tabList = [
     title: '已出行'
   },
   {
+    title: '已过期'
+  },
+  {
     title: '已退票'
   }
 ];
@@ -61,6 +64,8 @@ class Order extends Component {
   handleTabClick = (current) => {
     this.setState({
       tabCurrent: current
+    }, () => {
+      this.queryAllOrderData();
     })
   };
 
@@ -145,6 +150,7 @@ class Order extends Component {
     const togoOrder = allOrder.filter(order => order.order_status === 0) || [];
     const expiredOrder = allOrder.filter(order => order.order_status === 1) || [];
     const returnedOrder = allOrder.filter(order => order.order_status === 2) || [];
+    const invalidOrder = allOrder.filter(order => order.order_status === 3) || [];
     return (
       <View className="order">
         <AtTabs
@@ -232,6 +238,31 @@ class Order extends Component {
             </ScrollView>
           </AtTabsPane>
           <AtTabsPane className='order-tabPane' current={tabCurrent} index={3}>
+            <ScrollView
+              scrollY
+              enableBackToTop
+              className='order-scroll-list'
+            >
+              <View className='order-tabPane-container'>
+                {
+                  invalidOrder.length ? invalidOrder.map(order => (
+                    <OrderItem
+                      key={order.id}
+                      statusCode={order.order_status}
+                      departure={order.campus === '01' ? '海珠校区' : '白云校区'}
+                      destination={order.campus === '01' ? '白云校区' : '海珠校区'}
+                      orderTime={order.order_time}
+                      departTime={`${order.depart_date}  ${order.depart_time}`}
+                      departPlace={order.depart_place}
+                      ticketNum={order.ticket_num}
+                      carNum={order.car_num}
+                    />
+                  )) : <Blank/>
+                }
+              </View>
+            </ScrollView>
+          </AtTabsPane>
+          <AtTabsPane className='order-tabPane' current={tabCurrent} index={4}>
             <ScrollView
               scrollY
               enableBackToTop
