@@ -1,17 +1,18 @@
 import React from "react";
-import Taro, { Component } from '@tarojs/taro';
+import Taro, {Component} from '@tarojs/taro';
 import {View, Text, Image, ScrollView, Button} from '@tarojs/components';
 import dayjs from 'dayjs';
-import { connect } from '@tarojs/redux';
+import {connect} from '@tarojs/redux';
 import {
   AtTabs, AtTabsPane, AtInputNumber,
   AtModal, AtModalHeader,
-  AtModalContent, AtModalAction, AtIcon
+  AtModalContent, AtModalAction
 } from 'taro-ui';
 import Blank from "../../components/Blank";
 import './index.less';
 import ListItem from '../../components/ListItem';
 import homeEmpty from '../../images/icon/empty.png';
+import exchangeIcon from '../../images/icon/exchange.png';
 import {USER_INFO} from "../../utils/constants";
 import {baseUrl, stuBaseDay, teaBaseDay, manBaseDay} from "../../config";
 
@@ -21,7 +22,7 @@ import {baseUrl, stuBaseDay, teaBaseDay, manBaseDay} from "../../config";
  */
 let tabList = [];
 
-@connect(({ home }) => ({
+@connect(({home}) => ({
   ...home,
 }))
 class Index extends Component {
@@ -51,6 +52,15 @@ class Index extends Component {
 
   };
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    const {isShowQr} = this.props;
+
+    // 订票后更新数据
+    if (isShowQr && prevProps.isShowQr !== isShowQr) {
+      this.refreshData();
+    }
+  }
+
   onPullDownRefresh = () => {
     Taro.showLoading({
       title: '正在加载...',
@@ -60,7 +70,7 @@ class Index extends Component {
   };
 
   refreshData = () => {
-    const { tabCurrent } = this.state;
+    const {tabCurrent} = this.state;
     // 更新TabList
     this.processTabList();
     // 查询当天票务列表
@@ -72,7 +82,7 @@ class Index extends Component {
    * @param {string} day 要查询的日期，参数必须是dayjs可解释的
    */
   queryTicketListData = (day) => {
-    const { dispatch } = this.props;
+    const {dispatch} = this.props;
     const date = dayjs(day);
     const valueDate = date.format('YYYY-MM-DD');
     dispatch({
@@ -91,7 +101,7 @@ class Index extends Component {
     tabList = [];
 
     // 更新tabs日期
-    for (let i = 0; i < bookableDateNum; ++i){
+    for (let i = 0; i < bookableDateNum; ++i) {
       tabList.push({
         title: today.add(i, 'day').format('M[月]DD'),
         value: today.add(i, 'day').format('YYYY-MM-DD')
@@ -120,7 +130,7 @@ class Index extends Component {
 
   handleDepartureChange = () => {
     this.setState(({isHaizhuCampus}) => ({
-      isHaizhuCampus: !isHaizhuCampus
+      isHaizhuCampus: !isHaizhuCampus,
     }))
   };
 
@@ -131,18 +141,18 @@ class Index extends Component {
   };
 
   handleModalClose = () => {
-    const { dispatch } = this.props;
+    const {dispatch, isShowQr} = this.props;
     this.setState({
       isModalOpen: false
     });
-    dispatch({
+    isShowQr && dispatch({
       type: 'home/isShowQrEnd',
       payload: false
     });
   };
 
   handleBooking = (carId, num, userId) => {
-    const { dispatch } = this.props;
+    const {dispatch} = this.props;
     dispatch({
       type: 'home/queryBookingTicket',
       carId,
@@ -152,26 +162,26 @@ class Index extends Component {
   };
 
   renderDestCard = () => {
-    const { isHaizhuCampus } = this.state;
+    const {isHaizhuCampus, exchangeIconAnimation} = this.state;
     return (
       <View className='header-banner-outer'>
         <View className='at-row at-row__align--center inner'>
           <View className='at-col at-col-5 home-location departure'>
             <Text className='departure-label'>出发地</Text>
             <Text className='departure-name'>
-              { isHaizhuCampus ? '海珠校区' : '白云校区' }
+              {isHaizhuCampus ? '海珠校区' : '白云校区'}
             </Text>
           </View>
           <View
             className='at-col at-col-2 home-location-exchange'
             onClick={this.handleDepartureChange}
           >
-            <AtIcon value='repeat-play' color='#6190E8' size='32' />
+            <Image className='home-location-icon' src={exchangeIcon} mode='aspectFit'/>
           </View>
           <View className='at-col at-col-5 home-location destination'>
             <Text className='destination-label'>目的地</Text>
             <Text className='destination-name'>
-              { isHaizhuCampus ? '白云校区' : '海珠校区' }
+              {isHaizhuCampus ? '白云校区' : '海珠校区'}
             </Text>
           </View>
         </View>
@@ -180,22 +190,22 @@ class Index extends Component {
   };
 
   renderTicketList = () => {
-    const { h_ticket, b_ticket } = this.props;
-    const { isHaizhuCampus } = this.state;
+    const {h_ticket, b_ticket} = this.props;
+    const {isHaizhuCampus} = this.state;
     const ticketData = isHaizhuCampus ? h_ticket : b_ticket;
 
     const list = ticketData.length
       ? ticketData.map((item) => (
-          <ListItem
-            key={item.id}
-            departTime={item.depart_time}
-            restTicket={item.rest_ticket}
-            departure={item.depart_place}
-            carNum={item.car_num}
-            disabled={item.rest_ticket === 0}
-            onClick={() => this.handleItemClick(item.id)}
-          />)
-        )
+        <ListItem
+          key={item.id}
+          departTime={item.depart_time}
+          restTicket={item.rest_ticket}
+          departure={item.depart_place}
+          carNum={item.car_num}
+          disabled={item.rest_ticket === 0}
+          onClick={() => this.handleItemClick(item.id)}
+        />)
+      )
       : <Blank content='暂无可订票务' icon={homeEmpty}/>;
 
     return (
@@ -204,14 +214,14 @@ class Index extends Component {
         enableBackToTop
         className='ticket-scroll-list'
       >
-        { list }
+        {list}
       </ScrollView>
     );
   };
 
   renderBookingLayout = () => {
-    const { ticketBookingNum, carId } = this.state;
-    const { carList } = this.props;
+    const {ticketBookingNum, carId} = this.state;
+    const {carList} = this.props;
     const authObj = Taro.getStorageSync(USER_INFO);
     const auth_stu = authObj.authority === 1;
     const auth_tea = authObj.authority === 2;
@@ -267,7 +277,7 @@ class Index extends Component {
             className='modal-btn'
             onClick={() => this.handleBooking(carId, ticketBookingNum, authObj.id)}
           >
-            { auth_stu || auth_tea ? '订票' : '确认预留' }
+            {auth_stu || auth_tea ? '确认订票' : '确认预留'}
           </Button>
         </AtModalAction>
       </View>
@@ -275,9 +285,7 @@ class Index extends Component {
   };
 
   renderQrLayout = () => {
-    const { tmp_orderId } = this.props;
-    // 更新余票数
-    this.queryTicketListData();
+    const {tmp_orderId} = this.props;
     return (
       <View>
         <AtModalHeader>订票成功</AtModalHeader>
@@ -298,8 +306,8 @@ class Index extends Component {
   };
 
   renderModal = () => {
-    const { isModalOpen } = this.state;
-    const { isShowQr } = this.props;
+    const {isModalOpen} = this.state;
+    const {isShowQr} = this.props;
     return (
       <AtModal
         isOpened={isModalOpen}
@@ -313,21 +321,21 @@ class Index extends Component {
   };
 
   renderTabPane = () => {
-    const { tabCurrent } = this.state;
+    const {tabCurrent} = this.state;
     const arr = tabList.slice();
     return arr.length
       ? arr.map((item, index) => (
-        <AtTabsPane className='home-tabPane' current={tabCurrent} index={index}>
+        <AtTabsPane key={index + Math.random()} className='home-tabPane' current={tabCurrent} index={index}>
           <View className='home-tabPane-container'>
-            { this.renderDestCard() }
-            { this.renderTicketList() }
+            {this.renderDestCard()}
+            {this.renderTicketList()}
           </View>
         </AtTabsPane>))
       : '';
   };
 
   render() {
-    const { tabCurrent } = this.state;
+    const {tabCurrent} = this.state;
     return (
       <View className="home">
         <AtTabs

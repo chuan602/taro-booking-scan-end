@@ -1,6 +1,7 @@
 // 请求连接前缀
-// export const baseUrl = 'https://chuan602.top';
-export const baseUrl = 'http://localhost:443';
+export const baseUrl = process.env.NODE_ENV === 'production'
+  ? 'https://chuan602.top'
+  : 'http://localhost:443';
 
 // 各权限可提前订票基本天数
 export const stuBaseDay = 3;
