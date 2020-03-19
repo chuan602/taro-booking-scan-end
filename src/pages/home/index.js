@@ -153,12 +153,18 @@ class Index extends Component {
 
   handleBooking = (carId, num, userId) => {
     const {dispatch} = this.props;
-    dispatch({
-      type: 'home/queryBookingTicket',
-      carId,
-      num,
-      userId
+    Taro.showModal({
+      title: '订票确认',
+      content: '您确定订票吗？'
     })
+      .then(({confirm}) => {
+        confirm && dispatch({
+          type: 'home/queryBookingTicket',
+          carId,
+          num,
+          userId
+        });
+      });
   };
 
   renderDestCard = () => {
