@@ -43,9 +43,10 @@ export default {
           payload: true
         })
       } else {
-        Taro.showToast({
+        Taro.showModal({
           title: '订票失败',
-          duration: 2000
+          content: '抱歉，您已订此班车票，不能重复订票',
+          showCancel: false
         });
       }
     }

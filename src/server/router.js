@@ -65,39 +65,53 @@ router.get('/carList', function (req, res) {
 * */
 router.post('/booking', function (req, res) {
   const { id, num, userId } = req.body;
+  const authCode = req.get('auth-code');
   connection.beginTransaction(function (err) {
     if (err) { res.status(500) }
-    // 减少数据库中的剩余票数
-    connection.query(`update t_ticket set rest_ticket = rest_ticket - ? where id = ?`,
-      [num, id], function (err, data) {
-        if (err) {
-          connection.rollback(function () {
-            res.status(500);
-          })
-        }
-        if (data) {
-          // 在订单表中新增订单记录
-          const orderId = uuid();
-          connection.query(`insert into t_order (id, user_id, car_id, order_time, ticket_num, order_status) values(?,?,?,?,?,?)`,
-            [orderId, userId, id, new Date(), num, 0], function (err, insertData) {
-              if (err) {
-                connection.rollback(function () {
-                  res.status(500);
-                })
-              }
-              if (insertData) {
-                connection.commit(function (e) {
-                  if (e) {
-                    connection.rollback(function (err) {
-                      res.status(500);
-                    })
-                  }
-                  res.send(orderId);
-                })
-              }
-            });
-        }
-      })
+    const bookingTicket = () => {
+      // 减少数据库中的剩余票数
+      connection.query(`update t_ticket set rest_ticket = rest_ticket - ? where id = ?`,
+        [num, id], function (err, data) {
+          if (err) {
+            connection.rollback(function () {
+              res.status(500);
+            })
+          }
+          if (data) {
+            // 在订单表中新增订单记录
+            const orderId = uuid();
+            connection.query(`insert into t_order (id, user_id, car_id, order_time, ticket_num, order_status) values(?,?,?,?,?,?)`,
+              [orderId, userId, id, new Date(), num, 0], function (err, insertData) {
+                if (err) {
+                  connection.rollback(function () {
+                    res.status(500);
+                  })
+                }
+                if (insertData) {
+                  connection.commit(function (e) {
+                    if (e) {
+                      connection.rollback(function (err) {
+                        res.status(500);
+                      })
+                    }
+                    res.send(orderId);
+                  })
+                }
+              });
+          }
+        })
+    };
+    if (authCode === '3') {
+      // 管理员预留票
+      bookingTicket();
+    } else {
+      // 查询订票合法性（是否已订过此班次）
+      connection.query(`SELECT * FROM t_order WHERE user_id = ? AND car_id = ? AND order_status = 0`,
+        [userId, id], function (err, data) {
+          if (err) { res.status(500) }
+          data.length ? res.send('') : bookingTicket();
+        })
+    }
   });
 });
 
