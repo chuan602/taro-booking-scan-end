@@ -12,7 +12,8 @@ class Password extends Component {
 
   state = {
     originPassword: '',
-    newPassword: ''
+    newPassword: '',
+    confirmPassword: ''
   };
 
   config = {
@@ -31,9 +32,15 @@ class Password extends Component {
     })
   };
 
+  handleConfirmPasswordChange = (val) => {
+    this.setState({
+      confirmPassword: val
+    })
+  };
+
   handleSubmit = () => {
     const { dispatch } = this.props;
-    const { originPassword, newPassword } = this.state;
+    const { originPassword, newPassword, confirmPassword } = this.state;
     if (originPassword === newPassword) {
       Taro.atMessage({
         message: '原密码与新密码不能相同',
@@ -42,15 +49,29 @@ class Password extends Component {
       });
       return;
     }
-    dispatch({
-      type: 'password/queryPasswordModify',
-      originPassword,
-      newPassword
+    if (confirmPassword !== newPassword) {
+      Taro.atMessage({
+        message: '确认密码与新密码需要相同',
+        type: 'error',
+        duration: 2000
+      });
+      return;
+    }
+    Taro.showModal({
+      title: '修改密码确认',
+      content: '您确定修改密码吗？'
     })
+      .then(({confirm}) => {
+        confirm && dispatch({
+          type: 'password/queryPasswordModify',
+          originPassword,
+          newPassword
+        });
+      });
   };
 
   render() {
-    const { originPassword, newPassword } = this.state;
+    const { originPassword, newPassword, confirmPassword } = this.state;
     const { dispatch, isModifyError } = this.props;
     return (
       <View className="password">
@@ -83,6 +104,22 @@ class Password extends Component {
             value={ newPassword }
             error={ isModifyError }
             onChange={ this.handleNewPasswordChange }
+            onFocus={ () => dispatch({
+              type: 'password/isModifyErrorEnd',
+              payload: false
+            }) }
+          />
+          <AtInput
+            clear
+            className='confirm-password'
+            name='confirmPassword'
+            placeholder='请再次输入新密码'
+            title='确认新密码'
+            type='password'
+            maxLength={16}
+            value={ confirmPassword }
+            error={ isModifyError }
+            onChange={ this.handleConfirmPasswordChange }
             onFocus={ () => dispatch({
               type: 'password/isModifyErrorEnd',
               payload: false

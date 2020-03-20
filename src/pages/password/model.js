@@ -29,13 +29,17 @@ export default {
         // 修改成功
         Taro.showToast({
           title: '修改成功',
+          duration: 3000,
+          mask: true,
           icon: 'success'
-        });
-        // 重新登陆
-        Taro.clearStorage();
-        Taro.reLaunch({
-          url: '/pages/login/index'
-        });
+        })
+          .then(() => {
+            // 重新登陆
+            Taro.clearStorage();
+            Taro.reLaunch({
+              url: '/pages/login/index'
+            });
+          })
       }
     }
   },
