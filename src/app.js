@@ -1,6 +1,6 @@
 import '@tarojs/async-await';
 import Taro, { Component } from '@tarojs/taro';
-import 'taro-ui/dist/style/index.scss';
+import 'taro-ui/dist/style/index.scss'
 import { Provider } from '@tarojs/redux';
 import Home from './pages/home';
 import dva from './utils/dva';
@@ -20,7 +20,6 @@ class App extends Component {
       'pages/login/index',
       'pages/home/index',
       'pages/user/index',
-      'pages/order/index',
       'pages/password/index',
     ],
     window: {

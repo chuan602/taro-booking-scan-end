@@ -1,72 +1,85 @@
 import Taro from '@tarojs/taro';
+import dayjs from "dayjs";
 import {
   queryBookingTicketService,
   queryCarListByDateService
 } from './service';
+const pickerDataColumn1 = [
+  {
+    id: 0,
+    name: '海珠校区'
+  },
+  {
+    id: 1,
+    name: '白云校区'
+  }
+];
 
 export default {
   namespace: 'home',
   state: {
-    carList: [],
+    ticketList: [],
     h_ticket: [],
     b_ticket: [],
-    tmp_orderId: '',
-    isShowQr: false
+    pickerSourceData: [],
+    pickerValue: [0, 0]
   },
   effects: {
-    *queryCarListByDate({payload}, { put, call }){
+    *queryTicketListByDate({}, { put, call }){
       try {
-        const res = yield call(queryCarListByDateService, payload);
+        Taro.showLoading({
+          title: 'loading',
+          mask: true
+        });
+        const date = dayjs().format('YYYY-MM-DD');
+        const res = yield call(queryCarListByDateService, date);
         yield put({
-          type: 'queryCarListEnd',
+          type: 'queryTicketListEnd',
           payload: res.data || []
         })
       } finally {
         Taro.hideLoading();
         Taro.stopPullDownRefresh();
       }
-    },
-    *queryBookingTicket({carId, num, userId}, { put, call }){
-      Taro.showLoading({
-        title: '',
-        mask: true
-      });
-      const res = yield call(queryBookingTicketService, carId, num, userId);
-      Taro.hideLoading();
-      if (res.data) {
-        yield put({
-          type: 'queryBookingTicketEnd',
-          payload: res.data
-        });
-        yield put({
-          type: 'isShowQrEnd',
-          payload: true
-        })
-      } else {
-        Taro.showModal({
-          title: '订票失败',
-          content: '抱歉，您已订此班车票，不能重复订票',
-          showCancel: false
-        });
-      }
     }
   },
   reducers: {
-    queryCarListEnd(state, { payload }){
-      const h_ticket = payload.filter(item => item.campus === '01');
-      const b_ticket = payload.filter(item => item.campus === '02');
-      return { ...state, carList: payload, h_ticket, b_ticket};
+    queryTicketListEnd(state, { payload }){
+      const h_ticket = payload.filter(item => item.campus === '01').map((item => {
+        return {
+          id: item.id,
+          name: `${item.depart_time} | ${item.car_num}`
+        }
+      }));
+      const b_ticket = payload.filter(item => item.campus === '02').map((item => {
+        return {
+          id: item.id,
+          name: `${item.depart_time} | ${item.car_num}`
+        }
+      }));
+      if (!h_ticket.length) h_ticket[0] = {name: '暂无班车信息'};
+      return { ...state, ticketList: payload, h_ticket, b_ticket, pickerSourceData: [pickerDataColumn1, h_ticket]};
     },
-    queryBookingTicketEnd(state, { payload, clear }){
+    columnOneChangeEnd(state, { payload }){
+      const { h_ticket, b_ticket } = state;
+      const columnTwoData = payload === 0 ? h_ticket : b_ticket;
       return {
         ...state,
-        tmp_orderId: clear ? '' : payload
+        pickerValue: [0, 0],
+        pickerSourceData: [pickerDataColumn1, columnTwoData.length ? columnTwoData : [{name: '暂无班车信息'}]]
       }
     },
-    isShowQrEnd(state, { payload }){
+    columnTwoChangeEnd(state, { payload }){
+      const { pickerValue } = state;
       return {
         ...state,
-        isShowQr: payload
+        pickerValue: [pickerValue[0], payload]
+      }
+    },
+    pickerValueEnd(state, { payload }){
+      return {
+        ...state,
+        pickerValue: payload
       }
     }
   },

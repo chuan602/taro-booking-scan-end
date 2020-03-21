@@ -59,20 +59,6 @@ export default class User extends Component {
         </View>
         <AtList>
           <AtListItem
-            title='我的订单'
-            thumb={orderIcon}
-            onClick={() => Taro.navigateTo({
-              url: '/pages/order/index'
-            })}
-            arrow='right'
-          />
-          <AtListItem
-            title='我的信用分'
-            thumb={pointIcon}
-            onClick={() => {}}
-            arrow='right'
-          />
-          <AtListItem
             title='更改密码'
             thumb={modifyIcon}
             onClick={() => Taro.navigateTo({

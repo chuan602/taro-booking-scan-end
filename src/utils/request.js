@@ -7,7 +7,7 @@ export default ({ url, header, ...rest }) => {
   return Taro.request({
     url: baseUrl + url,
     header: Object.assign({}, header, {
-      'auth-code': auth ? auth.authority : '',
+      'scanner': true
     }),
     ...rest
   })

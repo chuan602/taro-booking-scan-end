@@ -1,8 +1,8 @@
 import Request from '../../utils/request';
 
-export const queryCarListByDateService = date =>
+export const queryCarListByDateService = (date) =>
   Request({
-    url: '/carList',
+    url: '/scan/carList',
     method: 'GET',
     data: {
       date

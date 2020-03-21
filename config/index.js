@@ -46,9 +46,10 @@ const config = {
           enable: true
         }
       }
-    }
+    },
+    esnextModules: ['taro-ui']
   }
-}
+};
 
 module.exports = function (merge) {
   if (process.env.NODE_ENV === 'development') {
