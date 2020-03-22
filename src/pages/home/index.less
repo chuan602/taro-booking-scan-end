@@ -1,5 +1,32 @@
 @import '../../styles/base.less';
 
 .home {
-
+  padding: 30px;
+  .picker{
+    margin-top: 30px;
+    font-size: 16PX;
+  }
+  .picker-content{
+    display: flex;
+    padding: 20px 10px;
+    justify-content: space-between;
+    border-top: .5px solid #ccc;
+    border-bottom: .5px solid #ccc;
+  }
+  .picker-value{
+    color: #999;
+    font-size: 14PX;
+  }
+  .scanner-container{
+    position: absolute;
+    left: 40px;
+    right: 40px;
+    bottom: 50px;
+    padding: 0 10px;
+  }
+  .scanner{
+    letter-spacing: 5px;
+    width: 100%;
+    background-color: @color-theme;
+  }
 }

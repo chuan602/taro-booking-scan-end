@@ -4,6 +4,7 @@ import {View, Text, Image, Picker, Button} from '@tarojs/components';
 import dayjs from 'dayjs';
 import {connect} from '@tarojs/redux';
 import './index.less';
+import {AtButton} from "taro-ui";
 
 @connect(({home}) => ({
   ...home,
@@ -16,7 +17,8 @@ class Index extends Component {
   };
 
   state = {
-    isPickerActive: false
+    isPickerActive: false,
+    scanContent: ''
   };
 
   componentWillMount() {
@@ -35,7 +37,6 @@ class Index extends Component {
       type: 'home/pickerValueEnd',
       payload: e.detail.value
     });
-    console.log('change e', e);
   };
 
   handlePickerColumnChange = (e) => {
@@ -48,17 +49,21 @@ class Index extends Component {
         payload: value
       });
     }
-    // if (column === 1) {
-    //   dispatch({
-    //     type: 'home/columnTwoChangeEnd',
-    //     payload: value
-    //   })
-    // }
-    console.log('column change e', e);
+  };
+
+  handleScannerClick = () => {
+    Taro.scanCode({
+      onlyFromCamera: true
+    })
+      .then(({result}) => {
+        this.setState({
+          scanContent: result
+        })
+      });
   };
 
   render() {
-    const { isPickerActive } = this.state;
+    const { isPickerActive, scanContent } = this.state;
     const { pickerSourceData, pickerValue } = this.props;
     console.log('pickerSourceData', pickerSourceData);
     return (
@@ -71,18 +76,43 @@ class Index extends Component {
             onColumnChange={this.handlePickerColumnChange}
             range={pickerSourceData}
             rangeKey='name'
+            className='picker'
           >
             <View
               className='picker-content'
             >
-              当前班次：
-              {
-                isPickerActive
-                  ? `${pickerSourceData[0][pickerValue[0]]['name']} ${pickerSourceData[1][pickerValue[1]]['name']}`
-                  : '请选择班车信息'
-              }
+              <Text
+                className='picker-title'
+              >
+                当前班次：
+              </Text>
+              <Text
+                className='picker-value'
+              >
+                {
+                  isPickerActive
+                    ? `${pickerSourceData[0][pickerValue[0]]['name']} ${pickerSourceData[1][pickerValue[1]]['name']}`
+                    : '请选择班车信息'
+                }
+              </Text>
             </View>
           </Picker>
+        </View>
+        <View>
+          {
+            scanContent
+          }
+        </View>
+        <View className='scanner-container'>
+          <AtButton
+            full
+            type='primary'
+            disabled={!isPickerActive}
+            className='scanner'
+            onClick={this.handleScannerClick}
+          >
+            开始扫码
+          </AtButton>
         </View>
       </View>
     );
