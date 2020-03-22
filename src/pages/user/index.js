@@ -2,10 +2,8 @@ import React from "react";
 import Taro, { Component } from '@tarojs/taro';
 import {Text, View} from '@tarojs/components';
 import { connect } from '@tarojs/redux';
-import {AtList, AtListItem, AtModal, AtToast} from "taro-ui";
+import {AtList, AtListItem} from "taro-ui";
 import { USER_INFO } from '../../utils/constants';
-import orderIcon from '../../images/user/order.png';
-import pointIcon from '../../images/user/point.png';
 import modifyIcon from '../../images/user/modify-password.png';
 import './index.less';
 
@@ -35,17 +33,14 @@ export default class User extends Component {
   };
 
   render() {
-    const { isModalOpen } = this.state;
-    const { authority, num } = Taro.getStorageSync('USER_INFO') || {};
+    const { num } = Taro.getStorageSync('USER_INFO') || {};
     return (
       <View className="user-page">
         <View className="user-page-banner">
           <View className='user-info-card'>
             <View className='left-container'>
               <Text className='left-title'>
-                {
-                  authority === 1 ? '学号' : authority === 2 ? '工号' : '管理员'
-                }
+                乘务员
               </Text>
               <Text className='left-value'>{ num }</Text>
             </View>

@@ -44,7 +44,7 @@ export default {
       } catch (e) {
         Taro.atMessage({
           type: 'error',
-          message: '系统错误！请联系管理员！errMsg:' + e
+          message: '系统错误！请联系管理员！'
         });
       } finally {
         yield put({

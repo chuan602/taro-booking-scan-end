@@ -7,7 +7,8 @@ export const loginService = ({ userNum, password }) => (
     method: 'POST',
     data: {
       userNum,
-      password
+      password,
+      isScanEnd: true
     }
   })
 )

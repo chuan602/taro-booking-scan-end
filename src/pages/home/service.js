@@ -9,14 +9,13 @@ export const queryCarListByDateService = (date) =>
     },
   });
 
-export const queryBookingTicketService = (carId, num, userId) =>
+export const queryScanService = (orderId, carId) =>
   Request({
-    url: '/booking',
+    url: '/scan/qr',
     method: 'POST',
     data: {
-      id: carId,
-      num,
-      userId
+      orderId,
+      carId
     }
   });
 

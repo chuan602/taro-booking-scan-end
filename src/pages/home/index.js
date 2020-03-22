@@ -4,7 +4,7 @@ import {View, Text, Image, Picker, Button} from '@tarojs/components';
 import dayjs from 'dayjs';
 import {connect} from '@tarojs/redux';
 import './index.less';
-import {AtButton} from "taro-ui";
+import {AtButton, AtMessage} from "taro-ui";
 
 @connect(({home}) => ({
   ...home,
@@ -18,7 +18,8 @@ class Index extends Component {
 
   state = {
     isPickerActive: false,
-    scanContent: ''
+    scanContent: '',
+    currentCarId: ''
   };
 
   componentWillMount() {
@@ -29,9 +30,10 @@ class Index extends Component {
   }
 
   handlePickerValueChange = (e) => {
-    const { dispatch } = this.props;
+    const { dispatch, pickerSourceData } = this.props;
     this.setState({
-      isPickerActive: true
+      isPickerActive: true,
+      currentCarId: pickerSourceData[1][e.detail.value[1]]['id']
     });
     dispatch({
       type: 'home/pickerValueEnd',
@@ -52,20 +54,26 @@ class Index extends Component {
   };
 
   handleScannerClick = () => {
+    const { dispatch } = this.props;
+    const { currentCarId } = this.state;
     Taro.scanCode({
       onlyFromCamera: true
     })
       .then(({result}) => {
         this.setState({
           scanContent: result
+        });
+        dispatch({
+          type: 'home/queryScan',
+          orderId: result,
+          carId: currentCarId
         })
       });
   };
 
   render() {
-    const { isPickerActive, scanContent } = this.state;
+    const { isPickerActive } = this.state;
     const { pickerSourceData, pickerValue } = this.props;
-    console.log('pickerSourceData', pickerSourceData);
     return (
       <View className="home">
         <View className='bus-picker-container'>
@@ -98,11 +106,6 @@ class Index extends Component {
             </View>
           </Picker>
         </View>
-        <View>
-          {
-            scanContent
-          }
-        </View>
         <View className='scanner-container'>
           <AtButton
             full
@@ -114,6 +117,7 @@ class Index extends Component {
             开始扫码
           </AtButton>
         </View>
+        <AtMessage />
       </View>
     );
   }

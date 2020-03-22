@@ -1,5 +1,5 @@
 const config = {
-  projectName: 'taro-booking',
+  projectName: 'taro-booking-scan-end',
   date: '2019-9-27',
   // 设计稿尺寸
   designWidth: 750,

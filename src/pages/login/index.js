@@ -93,6 +93,7 @@ class Login extends Component {
             登陆
           </AtButton>
         </AtForm>
+        <View className='version-tip'>乘务员版</View>
         <AtMessage />
       </View>
     );
