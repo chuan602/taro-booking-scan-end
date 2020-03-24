@@ -20,17 +20,29 @@ export default {
           payload: true
         });
         const res = yield call(loginService, payload);
-        if (res.data) {
+        const { status, data } = res.data;
+        let msg = '账号或密码错误！';
+        if (Math.floor(res.statusCode/500) === 1) {
+          msg = '服务器出错，请联系管理员';
+          // 显示出错标语
+          Taro.atMessage({
+            type: 'error',
+            message: msg
+          });
+          yield put({
+            type: 'isLoginErrorEnd',
+            payload: true
+          });
+          return;
+        }
+
+        if (status === 200) {
           //登陆验证成功
-          Taro.setStorageSync(USER_INFO, res.data);
+          Taro.setStorageSync(USER_INFO, data);
           Taro.switchTab({
             url: '/pages/home/index'
           })
         } else {
-          let msg = '账号或密码错误！';
-          if (Math.floor(res.statusCode/500) === 1) {
-            msg = '服务器出错，请联系管理员'
-          }
           // 显示出错标语
           Taro.atMessage({
             type: 'error',
