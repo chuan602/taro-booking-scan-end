@@ -22,6 +22,13 @@ class Index extends Component {
     currentCarId: ''
   };
 
+  onPullDownRefresh() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'home/queryTicketListByDate'
+    })
+  }
+
   componentWillMount() {
     const { dispatch } = this.props;
     dispatch({
